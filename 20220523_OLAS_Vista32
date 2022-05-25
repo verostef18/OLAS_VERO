@@ -1,0 +1,139 @@
+$(function () {
+    var tipo = $('#eg_riesgo_tipo option:selected').text();
+    $('#eg_riesgo_tipo').on('change',function(){
+        if(tipo === "Auto"||tipo === "Moto"||tipo === "Flota"||tipo === "Hogar"||tipo === "ART"||tipo === "Asistencia al Hogar"||tipo === "Asistencia al Hogar"||tipo === "Asistencia Mascota"||tipo === "Asistencia al viajero"||tipo === "Flota"||tipo === "Vida"||tipo === "Prepaga"||tipo === "Masivo"){
+            $('#eg_riesgo_renovacion_automatica').prop('checked', true);
+            $('#eg_riesgo_renovacion_automatica').attr("disabled", true);
+            if(tipo ==="Moto"){
+                 $('#eg_riesgo_renovacion_automatica').removeAttr("disabled");
+            }
+            
+        }else{
+            $('#eg_riesgo_renovacion_automatica').prop('checked', false);
+             $('#eg_riesgo_renovacion_automatica').removeAttr("disabled");
+        }
+        
+    });
+
+    $('#eg_cliente_entidad').prop('required',true);
+    
+    var cuil = function (){
+        var resultado = 0;
+        var dni = $("#eg_cliente_dni").val();
+        var sexo = $("#eg_cliente_sexo").val();
+        var xy;
+        if($("#eg_cliente_entidad").val() == 'Persona'){
+        	if(dni.length == 7){
+        		dni = 0+dni;
+        	}
+        	if($("#eg_cliente_sexo").val() == 'Masculino'){
+        		 xy = 20;
+        	}else if($("#eg_cliente_sexo").val() == 'Femenino'){
+        		 xy = 27;
+        	}else{
+        		 xy = 30;
+        	}
+        }
+        
+        var xydni = xy+dni;
+        var multiplicadores = [5,4,3,2,7,6,5,4,3,2];
+        var i;
+        for(i=0; i<10; i++){// Se realiza la multiplicacion
+                resultado += xydni.substr(i,1)*multiplicadores[i];
+        }
+        var resto = Math.floor(resultado/11);
+        var digitov = resultado - (11*resto);
+        
+        var z;
+        if(digitov == 0){
+        	z = digitov;
+        }else if(digitov == 1){
+        	if($("#eg_cliente_sexo").val() == 'Masculino'){
+                    xy = 23;
+                    z = 9;
+                }
+            if($("#eg_cliente_sexo").val() == 'Femenino'){ // Si digito verificador termina en 1 se cambia 27 por 23 y el digitov pasa a ser 4(Mujeres)
+                xy = 23;
+                z = 4;
+            }
+        }else{
+        	z = 11-digitov;
+        }
+        $("#eg_cliente_cuil_cuit").val(xy+dni+z);
+    };
+    
+    var funcioncita = function () {
+        if ($("#eg_cliente_entidad").val() == "Empresa") {
+            $('#eg_cliente_cuil_cuit').parent().parent().show();
+            $("#eg_cliente_cuil_cuit").prop("readonly", false);
+            $('#eg_cliente_apellido').parent().parent().hide();
+            $('#eg_cliente_nombre').parent().parent().hide();
+            $('#eg_cliente_dni').parent().parent().hide();
+            $("#eg_cliente_dni").prop("readonly", false);
+            $('#eg_cliente_fecha_nacimiento').parent().parent().parent().hide();
+            $('#eg_cliente_estado_civil').parent().parent().hide();
+            $('#eg_cliente_ocupacion').parent().parent().hide();
+            $('#eg_cliente_razon_social').parent().parent().show();
+            $('#eg_cliente_sexo').parent().parent().hide();
+            $('#eg_cliente_sexo').prop('required',false);
+            $('#eg_cliente_sexo').val('');
+        }else if($("#eg_cliente_entidad").val() == "Persona"){
+            $('#eg_cliente_sexo').prop('required',true);
+            $('#eg_cliente_sexo').parent().parent().show();
+            $('#eg_cliente_cuil_cuit').parent().parent().show();
+            $("#eg_cliente_cuil_cuit").prop("readonly", true);
+            $('#eg_cliente_apellido').parent().parent().show();
+            $('#eg_cliente_nombre').parent().parent().show();
+            $('#eg_cliente_dni').parent().parent().show();
+            $('#eg_cliente_dni').prop('required',true)
+            $('#eg_cliente_razon_social').parent().parent().hide();
+            $('#eg_cliente_fecha_nacimiento').parent().parent().parent().show();
+            $('#eg_cliente_estado_civil').parent().parent().show();
+            $('#eg_cliente_ocupacion').parent().parent().show();
+        }
+
+    };
+
+    $("#eg_cliente_entidad").on('change', function () {
+        funcioncita();
+    });
+    $("#eg_cliente_sexo").on('change', function () {
+        cuil()
+    });
+    $("#eg_cliente_dni").on('change', function () {
+        if($("#eg_cliente_entidad").val() == "Persona"){
+            cuil();
+        }
+        /*cuil();*/
+    });
+    funcioncita();
+    
+    function ordenarSelect(id_componente)
+    {
+      var selectToSort = jQuery('#' + id_componente);
+      var optionActual = selectToSort.val();
+      selectToSort.html(selectToSort.children('option').sort(function (a, b) {
+        return a.text === b.text ? 0 : a.text < b.text ? -1 : 1;
+      })).val(optionActual);
+    }
+    $(document).on('change', function () {
+      ordenarSelect('eg_cliente_subcanal');
+    });
+    
+    //Agregado 20220523_Ticket74707
+        
+    $('#eg_cliente_telefono1').keyup(function (){
+        $('#eg_cliente_telefono1').val((this.value + '').replace(/[^0-9]/g, ''));
+    });
+       
+    $('#eg_cliente_telefono2').keyup(function (){
+        $('#eg_cliente_telefono2').val((this.value + '').replace(/[^0-9]/g, ''));
+    });
+       
+    $('#eg_cliente_telefono3').keyup(function (){
+        $('#eg_cliente_telefono3').val((this.value + '').replace(/[^0-9]/g, ''));
+    });
+ 
+
+});
+   
